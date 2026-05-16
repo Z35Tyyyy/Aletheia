@@ -42,27 +42,30 @@ class OpenAIEmbedder:
         return arr / (np.linalg.norm(arr, axis=1, keepdims=True) + 1e-12)
 
 
-class LocalEmbedder:
-    """sentence-transformers fallback. all-MiniLM-L6-v2 is 384-dim — change
-    the migration to vector(384) before using this against a fresh database."""
+class FastEmbedder:
+    """FastEmbed (ONNX) implementation. Light memory footprint (~300MB RAM).
+    all-MiniLM-L6-v2 is 384-dim by default.
+    """
 
-    def __init__(self, model_name: str) -> None:
-        from sentence_transformers import SentenceTransformer
+    def __init__(self, model_name: str = "BAAI/bge-small-en-v1.5") -> None:
+        from fastembed import TextEmbedding
 
-        self._model = SentenceTransformer(model_name)
-        self.dim = self._model.get_sentence_embedding_dimension() or 384
+        # BAAI/bge-small-en-v1.5 is 384-dim, very high quality for its size.
+        self._model = TextEmbedding(model_name=model_name)
+        # FastEmbed handles the dimension detection
+        self.dim = 384 if "small" in model_name or "MiniLM" in model_name else 768
 
     def embed_query(self, text: str) -> np.ndarray:
-        v = self._model.encode([text], normalize_embeddings=True, convert_to_numpy=True)[0]
+        # embed() returns a generator of numpy arrays
+        v = next(self._model.embed([text]))
         return v.astype(np.float32)
 
     def embed_documents(self, texts: list[str]) -> np.ndarray:
         if not texts:
             return np.zeros((0, self.dim), dtype=np.float32)
-        return self._model.encode(
-            texts, normalize_embeddings=True, convert_to_numpy=True,
-            batch_size=32, show_progress_bar=False,
-        ).astype(np.float32)
+        # Convert generator to a single numpy array
+        embeddings = list(self._model.embed(texts))
+        return np.asarray(embeddings, dtype=np.float32)
 
 
 @lru_cache(maxsize=1)
@@ -70,5 +73,9 @@ def get_embedder() -> Embedder:
     s = get_settings()
     if s.embedder_provider == "openai" and s.openai_api_key:
         return OpenAIEmbedder(s.openai_api_key, s.embedder_model)
-    log.info("Using local embedder: %s", s.embedder_model)
-    return LocalEmbedder("sentence-transformers/all-MiniLM-L6-v2")
+
+    log.info("Using local FastEmbed: %s", s.embedder_model)
+    # Map 'local' or 'fastembed' to FastEmbedder
+    # Default to BAAI/bge-small-en-v1.5 which is 384-dim
+    model = s.embedder_model if s.embedder_model != "text-embedding-3-small" else "BAAI/bge-small-en-v1.5"
+    return FastEmbedder(model)

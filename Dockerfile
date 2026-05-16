@@ -35,6 +35,9 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 COPY backend/pyproject.toml .
 RUN pip install --no-cache-dir -e .
 
+# Pre-download the default embedding model to avoid cold starts in production
+RUN python -c "from fastembed import TextEmbedding; TextEmbedding(model_name='BAAI/bge-small-en-v1.5')"
+
 COPY backend/app ./app
 COPY backend/migrations ./migrations
 COPY scripts ./scripts
