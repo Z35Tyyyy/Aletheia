@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>ragfast — widget demo</title>
+    <style>
+      /* Deliberately hostile host CSS to prove the Shadow DOM isolation works. */
+      * { box-sizing: border-box; font-family: "Comic Sans MS", cursive !important; }
+      body {
+        margin: 0;
+        min-height: 100vh;
+        background:
+          radial-gradient(ellipse at top left, #ffe8d6 0%, transparent 50%),
+          radial-gradient(ellipse at bottom right, #d6e8ff 0%, transparent 50%),
+          #f7f5f0;
+        color: #2a2a2a;
+      }
+      .demo-wrap { max-width: 720px; margin: 0 auto; padding: 80px 32px; }
+      h1 { font-size: 42px; margin: 0 0 8px; letter-spacing: -0.02em;
+           font-family: Georgia, serif !important; }
+      p { line-height: 1.6; color: #555; }
+      code { background: #2a2a2a; color: #f7f5f0; padding: 2px 6px; border-radius: 3px;
+             font-family: ui-monospace, monospace !important; font-size: 13px; }
+    </style>
+  </head>
+  <body>
+    <div class="demo-wrap">
+      <h1>ragfast — embed widget</h1>
+      <p>
+        This host page sets <code>font-family: "Comic Sans MS" !important</code>
+        on every element and a clashing background. The widget below mounts into
+        a Shadow DOM root, so none of that leaks in. That's the whole point of
+        the embed architecture: it has to look like itself on any tenant's site,
+        no matter what their CSS does.
+      </p>
+      <p>Click the dot in the bottom-right to open the chat.</p>
+    </div>
+
+    <script type="module" src="/src/main.ts" data-api="http://localhost:8000"></script>
+  </body>
+</html>

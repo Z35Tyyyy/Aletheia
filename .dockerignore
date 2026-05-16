@@ -1,0 +1,17 @@
+node_modules
+**/node_modules
+**/dist
+**/__pycache__
+**/.pytest_cache
+.git
+.github
+.venv
+.env
+.env.*
+*.md
+docs/
+WRITEUP.md
+INTERVIEW_PREP.md
+RESUME_BULLETS.md
+DEPLOYMENT.md
+.gitignore

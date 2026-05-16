@@ -1,0 +1,83 @@
+# Hand-curated eval questions over the FastAPI documentation.
+# Edit freely. `expected_url_contains` is matched as a substring against
+# chunk.source_url; you can pass a single string or a list.
+
+- question: "How do I declare a path parameter in FastAPI?"
+  reference_answer: "Declare it in curly braces inside the path and as a typed function argument, e.g. @app.get('/items/{item_id}') def read_item(item_id: int):"
+  expected_url_contains: "path-params"
+
+- question: "What's the difference between Query parameters and Path parameters?"
+  reference_answer: "Path parameters come from the URL path itself (inside curly braces); query parameters come from the query string after '?' and are declared as function arguments with default values."
+  expected_url_contains: ["path-params", "query-params"]
+
+- question: "How do I make a query parameter required?"
+  reference_answer: "Declare the function argument without a default value, or use Query(...) with no default."
+  expected_url_contains: "query-params"
+
+- question: "How do I accept a JSON request body in FastAPI?"
+  reference_answer: "Declare a Pydantic BaseModel and use it as a type hint on the function argument."
+  expected_url_contains: "body"
+
+- question: "What is a Pydantic model used for in FastAPI?"
+  reference_answer: "Pydantic models define the shape of request and response data, providing automatic validation, serialization, and documentation."
+  expected_url_contains: ["body", "schema"]
+
+- question: "How do I use dependencies in FastAPI?"
+  reference_answer: "Define a function that returns a value, then declare it as a Depends() default in your path operation function."
+  expected_url_contains: "dependencies"
+
+- question: "How does FastAPI handle authentication with OAuth2?"
+  reference_answer: "Use OAuth2PasswordBearer to declare a token URL; FastAPI provides helpers for password flow and JWT tokens."
+  expected_url_contains: ["security", "oauth2"]
+
+- question: "What's the difference between Depends() and a regular function call?"
+  reference_answer: "Depends() lets FastAPI inject the dependency, handle caching within a request, and document it in the OpenAPI schema; calling the function directly does none of these."
+  expected_url_contains: "dependencies"
+
+- question: "How can I return a different status code from a path operation?"
+  reference_answer: "Pass `status_code=...` to the path operation decorator, or return a Response object with the desired status_code."
+  expected_url_contains: ["response", "status"]
+
+- question: "How do I declare optional query parameters?"
+  reference_answer: "Give the function argument a default value, e.g. q: str | None = None."
+  expected_url_contains: "query-params"
+
+- question: "How does FastAPI generate API documentation?"
+  reference_answer: "Automatically from the type hints and Pydantic models — Swagger UI is served at /docs and ReDoc at /redoc."
+  expected_url_contains: "first-steps"
+
+- question: "What's the recommended way to organize routes across multiple files?"
+  reference_answer: "Use APIRouter — create routers in separate modules and include them in the main app with app.include_router()."
+  expected_url_contains: ["bigger", "router"]
+
+- question: "How do I handle file uploads?"
+  reference_answer: "Use the File and UploadFile types; declare your parameter as `file: UploadFile = File(...)`"
+  expected_url_contains: ["request-files", "file"]
+
+- question: "How do I return HTML or plain text instead of JSON?"
+  reference_answer: "Return an HTMLResponse or PlainTextResponse from fastapi.responses, or set response_class on the path operation."
+  expected_url_contains: ["response", "custom-response"]
+
+- question: "What is a background task in FastAPI?"
+  reference_answer: "BackgroundTasks lets you schedule work to run after the response has been sent, without blocking the request."
+  expected_url_contains: "background-tasks"
+
+- question: "How do I validate that a query parameter is within a numeric range?"
+  reference_answer: "Use Query(gt=0, le=100) or similar — Query supports gt/ge/lt/le constraints."
+  expected_url_contains: "query-params-str-validations"
+
+- question: "Can I use async functions in path operations?"
+  reference_answer: "Yes — declare the path operation function with async def and use await inside."
+  expected_url_contains: ["async", "concurrency"]
+
+- question: "What's the difference between `async def` and `def` for path operations?"
+  reference_answer: "Both work; FastAPI runs `def` functions in a threadpool to avoid blocking the event loop, while `async def` runs them directly on the event loop and can use await."
+  expected_url_contains: ["async", "concurrency"]
+
+- question: "How do I configure CORS in FastAPI?"
+  reference_answer: "Use CORSMiddleware from fastapi.middleware.cors — add it with app.add_middleware() and configure allow_origins, allow_methods, etc."
+  expected_url_contains: "cors"
+
+- question: "How do I deploy a FastAPI application to production?"
+  reference_answer: "Run it behind a production ASGI server like Uvicorn (with workers) or Gunicorn with Uvicorn workers, behind a reverse proxy."
+  expected_url_contains: ["deployment", "uvicorn"]
